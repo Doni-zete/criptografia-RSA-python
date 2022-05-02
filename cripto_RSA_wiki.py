@@ -2,9 +2,6 @@
 # dessa página: https://pt.wikipedia.org/wiki/RSA_(sistema_criptogr%C3%A1fico)
 # Alguns dos métodos em java não existiam em python e por isso foram implementados.
 
-# Aqui esta pedindo para o usuario digitar a frase que será usada para ser criptografada
-msg = input("Digite a mensagem para ser cifrada: ")
-
 # As variaveis  "p" e "q" estão recebendo dois valores primos. Esses valores são desse tamanho porque
 # quando estava traduzindo o código para python percebi que o algoritmo da página só funcionava com numeros primos muito grande.
 # E esses números primos foram gerados utilizando um método do proprio java.
@@ -14,7 +11,6 @@ q = 1653890693756241291245776797099849430018553960817602808651084423225400114341
 
 
 # Aqui foi implementado um método que descobre o maior divisor comum entre dois números.
-
 def computeGCD(x, y):
     if x > y:
         small = y
@@ -38,13 +34,15 @@ def totientePhi():
 # isso faz parte do algoritimo.
 # Escolha um inteiro  "e"  , 1 < "e" < phi(n) ,  "e" e phi(n) sejam primos entre si.
 
+
 def primosEntreSi(m):
     e = 3
     while computeGCD(e, m) > 1:
         e += 2
     return e
 
-# Esse método foi implementado para fazer o mod inverso isso foi encontrado na internet
+# Esse método foi implementado para fazer o mod inverso
+
 def modInverse(a, m):
     m0 = m
     y = 0
@@ -76,9 +74,9 @@ def modInverse(a, m):
 
 
 n = p * q  # isso faz parte do algoritimo
-m = totientePhi() # utilização da Função totiente de Euler
-e = primosEntreSi(m) # tira os primos entre eles
-d = modInverse(e, m) # faz o mod inverso
+m = totientePhi()  # utilização da Função totiente de Euler
+e = primosEntreSi(m)  # tira os primos entre eles
+d = modInverse(e, m)  # faz o mod inverso
 
 # exibe os valores na tela
 print("p: {}".format(p))  # valor primo
@@ -88,6 +86,7 @@ print("n: {}".format(n))
 print("e: {}".format(e))  # A chave pública: o par (n,e)
 print("d: {}".format(d))  # chave privada: a tripla (p,q,d)
 
+
 # Converte numero decimal em um valor binario exemplo: (exemplo: 198 -> 11000110)
 def getBinaryOfNumber(vlr):
     return "{0:08b}".format(vlr)
@@ -96,13 +95,18 @@ def getBinaryOfNumber(vlr):
 print("\n\n")
 
 # mensagem cifrada - RSA_encrypt()
-def mensagemCigrada():
+
+
+def mensagemCifrada(mensagem):
+    converteAscii = [ord(letra) for letra in mensagem]
+    print("Valores da tabela ASCII: ", converteAscii)
+
     # Esta convertendo o texto para uma lista de valores da tabela ascii
     # e convertendo os valores numericos para suas forma binarias (exemplo: 198 -> 11000110)
     # Após isso todos os valores da lista são unidos formando um unico valor binario(exemplo: 198 -> 11000110; 153 -> 10011001; FICA: 1100011011000110)
     # Após isso o valor binario é convertido para o seu equivalente do tipo decimal. (exmp: 1100011011000110 -> 50886 )
     decimalFromBinary = int(
-        "".join([getBinaryOfNumber(ord(l)) for l in msg]), 2)
+        "".join([getBinaryOfNumber(ord(l)) for l in mensagem]), 2)
 
     # Aqui foi  utilizando o método proprio do python para fazer a exponenciação de um numero e
     # tirar o mod do valor. Como os valores eram extremamente grandes não foi possivel utilizar um método implementado por conta propria.
@@ -112,23 +116,19 @@ def mensagemCigrada():
     return msgcifrada
 
 
-msgCifrada = mensagemCigrada()
 print("\n\n")
 
 
-print("Mensagem  Cifrada: {}".format(msgCifrada))
-
 # mensagem decifrada - RSA_encrypt()
-def mensagemDecifrada():
-    # Faz parte do algoritimo para desincriptografar, 
-    msgdecifrada = pow(msgCifrada, d, n)
+def mensagemDecifrada(mensagem):
+    # Faz parte do algoritimo para desincriptografar
+    mensagem = pow(mensagem, d, n)
 
     # Aqui está convertendo um valor decimal para a sua forma binaria.
-    binaryFromDecimal = "{0:08b}".format(msgdecifrada)
+    binaryFromDecimal = "{0:08b}".format(mensagem)
 
     # aqui está verificando se tamanho do número é divisivel por 8. Caso não seja é adicionado
     # 0 no inicio do número até que ele seja divisivel por 8
-
     while len(binaryFromDecimal) % 8 != 0:
         binaryFromDecimal = "0{}".format(binaryFromDecimal)
 
@@ -139,17 +139,20 @@ def mensagemDecifrada():
                   for i, _ in enumerate(range(int(len(binaryFromDecimal)/8)))]
 
     # Aqui está exibindo cada valor referente da tabela ASCII
-    print("Valores da tabela ASCII:", arraDeBits)
-
-    # Aqui está convertendo cada valor numerico da tabela ASCII para sua forma de caracteres, unindo um array de strings.
+    # Aqui está convertendo cada valor numerico da tabela ASCII para sua forma de caracteres, unindo um array de string.
     resu = "".join([chr(caractere) for caractere in arraDeBits])
 
     return resu
 
+print(30*"=")
+opcao = int(input("Digite 1 para Criptografar:\nDigite 2 para Descriptografar:\n"))
 
-msgdecifrada = mensagemDecifrada()
-
-print("Mensagem Decifrada: {}".format(msgdecifrada))
-
-
-
+if opcao == 1:
+    print(60*"=")
+    print("Mensagem Cifrada: ", mensagemCifrada(input("Digite sua mensagem: ")))
+    print(60*"=")
+else:
+    print(60*"=")
+    print("Mensagem Decifrada: ", mensagemDecifrada(
+        int(input("Digite sua sua mensagem Cifrada: "))))
+    print(60*"=")
